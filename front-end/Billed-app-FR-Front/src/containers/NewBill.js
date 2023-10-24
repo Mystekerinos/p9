@@ -1,0 +1,101 @@
+import { ROUTES_PATH } from "../constants/routes.js";
+import Logout from "./Logout.js";
+
+export default class NewBill {
+  constructor({ document, onNavigate, store, localStorage }) {
+    this.document = document;
+    this.onNavigate = onNavigate;
+    this.store = store;
+    const formNewBill = this.document.querySelector(
+      `form[data-testid="form-new-bill"]`
+    );
+    formNewBill.addEventListener("submit", this.handleSubmit);
+    const file = this.document.querySelector(`input[data-testid="file"]`);
+    file.addEventListener("change", this.handleChangeFile);
+    this.fileUrl = null;
+    this.fileName = null;
+    this.billId = null;
+    new Logout({ document, localStorage, onNavigate });
+  }
+  handleChangeFile = (e) => {
+    const fileInput = this.document.querySelector(`input[data-testid="file"]`);
+    const file = fileInput.files[0];
+    if (!file) {
+      const errorMessage = this.document.querySelector(
+        `p[data-testid="error-message"]`
+      );
+      errorMessage.textContent = "Aucun fichier sélectionné.";
+      return;
+    }
+
+    const filePath = e.target.value.split(/\\/g);
+    const fileName = filePath[filePath.length - 1];
+    const fileExtension = fileName.split(".").pop();
+    const validExtensions = ["jpg", "jpeg", "png"];
+
+    if (!validExtensions.includes(fileExtension)) {
+      const errorMessage = this.document.querySelector(
+        `p[data-testid="error-message"]`
+      );
+      errorMessage.textContent =
+        "L'extension du fichier n'est pas valide. Veuillez sélectionner un fichier au format jpg, jpeg ou png.";
+      return;
+    }
+
+    const errorMessage = this.document.querySelector(
+      `p[data-testid="error-message"]`
+    );
+    errorMessage.textContent = "";
+
+    this.firestore.storage
+      .ref(`justificatifs/${fileName}`)
+      .put(file)
+      .then((snapshot) => snapshot.ref.getDownloadURL())
+      .then((url) => {
+        this.fileUrl = url;
+        this.fileName = fileName;
+      });
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(
+      'e.target.querySelector(`input[data-testid="datepicker"]`).value',
+      e.target.querySelector(`input[data-testid="datepicker"]`).value
+    );
+    const email = JSON.parse(localStorage.getItem("user")).email;
+    const bill = {
+      email,
+      type: e.target.querySelector(`select[data-testid="expense-type"]`).value,
+      name: e.target.querySelector(`input[data-testid="expense-name"]`).value,
+      amount: parseInt(
+        e.target.querySelector(`input[data-testid="amount"]`).value
+      ),
+      date: e.target.querySelector(`input[data-testid="datepicker"]`).value,
+      vat: e.target.querySelector(`input[data-testid="vat"]`).value,
+      pct:
+        parseInt(e.target.querySelector(`input[data-testid="pct"]`).value) ||
+        20,
+      commentary: e.target.querySelector(`textarea[data-testid="commentary"]`)
+        .value,
+      fileUrl: this.fileUrl,
+      fileName: this.fileName,
+      status: "pending",
+    };
+    this.updateBill(bill);
+    this.onNavigate(ROUTES_PATH["Bills"]);
+  };
+  //here au dessus
+  // not need to cover this function by tests
+  updateBill = (bill) => {
+    if (this.firestore) {
+      this.firestore
+        .bills()
+        .add(bill)
+        .then(() => {
+          this.onNavigate(ROUTES_PATH["Bills"]);
+        })
+        .catch((error) => error);
+    }
+  };
+}
