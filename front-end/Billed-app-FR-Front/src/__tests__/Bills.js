@@ -4,6 +4,8 @@
 
 import { screen, waitFor } from "@testing-library/dom";
 import BillsUI from "../views/BillsUI.js";
+import Bills from "../containers/Bills.js";
+import { fireEvent } from "@testing-library/dom";
 import { bills } from "../fixtures/bills.js";
 import { ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
@@ -45,6 +47,39 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(Chrono);
       expect(dates).toEqual(datesSorted);
     });
+  });
+});
+
+describe("When I am on Bills Page and I click on the icon eye", () => {
+  test("Then it should open the modal", () => {
+    // page bills
+    const html = BillsUI({
+      data: bills,
+    });
+    document.body.innerHTML = html;
+    // initialisation bills
+    const store = null;
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+    const billsList = new Bills({
+      document,
+      onNavigate,
+      store,
+      localStorage: window.localStorage,
+    });
+    // simulation modale
+    $.fn.modal = jest.fn();
+    const icon = screen.getAllByTestId("icon-eye")[0];
+    const handleClickIconEye = jest.fn(() =>
+      billsList.handleClickIconEye(icon)
+    );
+    icon.addEventListener("click", handleClickIconEye);
+    // déclenchement de l'événement
+    fireEvent.click(icon);
+    expect(handleClickIconEye).toHaveBeenCalled();
+    const modale = document.getElementById("modaleFile");
+    expect(modale).toBeTruthy();
   });
 });
 
