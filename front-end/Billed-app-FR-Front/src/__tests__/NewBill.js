@@ -2,14 +2,18 @@
  * @jest-environment jsdom
  */
 
-import { screen, waitFor } from "@testing-library/dom";
+import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
-import { fireEvent } from "@testing-library/dom";
+
 import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import store from "../__mocks__/store.js";
+
 import router from "../app/Router.js";
+import BillsUI from "../views/BillsUI.js";
+
+import store from "../__mocks__/store.js";
+import userEvent from "@testing-library/user-event";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
@@ -153,5 +157,23 @@ describe("When I select a file with an incorrect extension", () => {
     });
     expect(handleChangeFile).toHaveBeenCalled();
     expect(input.files[0].name).toBe("image.txt");
+
+    // Vérifier si l'élément 'error-message' affiche le texte attendu
+    const errorMessage = screen.getByTestId("error-message");
+    expect(errorMessage.textContent).toBe(
+      "L'extension du fichier n'est pas valide. Veuillez sélectionner un fichier au format jpg, jpeg ou png."
+    );
   });
+});
+test("Then it fails with a 404 message error", async () => {
+  const html = BillsUI({ error: "Erreur 404" });
+  document.body.innerHTML = html;
+  const message = await screen.getByText(/Erreur 404/);
+  expect(message).toBeTruthy();
+});
+test("Then it fails with a 500 message error", async () => {
+  const html = BillsUI({ error: "Erreur 500" });
+  document.body.innerHTML = html;
+  const message = await screen.getByText(/Erreur 500/);
+  expect(message).toBeTruthy();
 });
