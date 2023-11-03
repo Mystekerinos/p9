@@ -104,7 +104,37 @@ describe("When I select an image in a correct format", () => {
     expect(handleChangeFile).toHaveBeenCalled();
     expect(input.files[0].name).toBe("image.png");
   });
-  test("Then a bill is created", () => {
+
+  test("Then it displays an error message when no file is selected", () => {
+    const html = NewBillUI();
+    document.body.innerHTML = html;
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+    const newBill = new NewBill({
+      document,
+      onNavigate,
+      store: null,
+      localStorage: window.localStorage,
+    });
+
+    const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e));
+    const input = screen.getByTestId("file");
+    input.addEventListener("change", handleChangeFile);
+
+    // Simuler un événement de changement de fichier sans fichier sélectionné
+    fireEvent.change(input, {
+      target: {
+        files: [], // Aucun fichier sélectionné
+      },
+    });
+
+    // Vérifier si l'élément 'error-message' affiche le texte attendu
+    const errorMessage = screen.getByTestId("error-message");
+    expect(errorMessage.textContent).toBe("Aucun fichier sélectionné.");
+  });
+
+  test("Then a bill is created", async () => {
     //page NewBill
     const html = NewBillUI();
     document.body.innerHTML = html;
