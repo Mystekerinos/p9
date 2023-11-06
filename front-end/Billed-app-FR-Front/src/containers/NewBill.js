@@ -18,43 +18,45 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate });
   }
   handleChangeFile = (e) => {
-    const fileInput = this.document.querySelector(`input[data-testid="file"]`);
-    const file = fileInput.files[0];
-    if (!file) {
-      const errorMessage = this.document.querySelector(
-        `p[data-testid="error-message"]`
-      );
-      errorMessage.textContent = "Aucun fichier sélectionné.";
-      return;
-    }
-
+    e.preventDefault();
+    const file = this.document.querySelector(`input[data-testid="file"]`)
+      .files[0];
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length - 1];
-    const fileExtension = fileName.split(".").pop();
-    const validExtensions = ["jpg", "jpeg", "png"];
+    const formData = new FormData();
+    const email = JSON.parse(localStorage.getItem("user")).email;
+    formData.append("file", file);
+    formData.append("email", email);
 
-    if (!validExtensions.includes(fileExtension)) {
-      const errorMessage = this.document.querySelector(
-        `p[data-testid="error-message"]`
-      );
-      errorMessage.textContent =
-        "L'extension du fichier n'est pas valide. Veuillez sélectionner un fichier au format jpg, jpeg ou png.";
-      return;
+    if (
+      e.target.value.includes("jpg") ||
+      e.target.value.includes("jpeg") ||
+      e.target.value.includes("png")
+    ) {
+      this.store
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true,
+          },
+        })
+        .then(({ fileUrl, key }) => {
+          console.log(fileUrl);
+          this.billId = key;
+          this.fileUrl = fileUrl;
+          this.fileName = fileName;
+        })
+        .catch((error) => console.error(error));
+    } else {
+      let errorFormatFile = document.createElement("span");
+      errorFormatFile.classList.add("error-type-file");
+      errorFormatFile.setAttribute("data-testid", "errorFormatImg");
+      errorFormatFile.innerText =
+        "Merci de choisir un format supporté (.JPG, .JPEG, .PNG)";
+      e.target.parentNode.append(errorFormatFile);
+      e.target.value = "";
     }
-
-    const errorMessage = this.document.querySelector(
-      `p[data-testid="error-message"]`
-    );
-    errorMessage.textContent = "";
-
-    this.firestore.storage
-      .ref(`justificatifs/${fileName}`)
-      .put(file)
-      .then((snapshot) => snapshot.ref.getDownloadURL())
-      .then((url) => {
-        this.fileUrl = url;
-        this.fileName = fileName;
-      });
   };
 
   handleSubmit = (e) => {
@@ -85,17 +87,17 @@ export default class NewBill {
     this.updateBill(bill);
     this.onNavigate(ROUTES_PATH["Bills"]);
   };
-  //here au dessus
+
   // not need to cover this function by tests
   updateBill = (bill) => {
-    if (this.firestore) {
-      this.firestore
+    if (this.store) {
+      this.store
         .bills()
-        .add(bill)
+        .update({ data: JSON.stringify(bill), selector: this.billId })
         .then(() => {
           this.onNavigate(ROUTES_PATH["Bills"]);
         })
-        .catch((error) => error);
+        .catch((error) => console.error(error));
     }
   };
 }
