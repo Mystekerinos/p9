@@ -211,6 +211,13 @@ describe("Given I am a user connected as Employee", () => {
         store: store,
         localStorage: window.localStorage,
       });
+      store.bills.mockImplementationOnce(() => {
+        return {
+          update: () => {
+            return Promise.reject(new Error("Erreur 404"));
+          },
+        };
+      });
 
       store.bills.mockImplementationOnce(() => {
         return {
