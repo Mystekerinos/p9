@@ -23,3 +23,11 @@ Bill
 **plan de tests End-To-End pour le parcours employé :**
 
 <img width="793" alt="Capture d’écran 2024-09-01 à 21 34 46" src="https://github.com/user-attachments/assets/e797ab6f-a95c-4047-99d1-c6d3a4bdcf43">
+
+**Technologies:**
+
+. HTML
+
+. Javascript
+
+. CSS
