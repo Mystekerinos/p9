@@ -9,3 +9,8 @@ Bill
 <img width="834" alt="Capture d’écran 2024-09-01 à 21 29 02" src="https://github.com/user-attachments/assets/47839a49-2c43-4a99-a1cd-e739663e1f7f">
 
 <img width="788" alt="Capture d’écran 2024-09-01 à 21 29 15" src="https://github.com/user-attachments/assets/11e5f23e-f495-4df8-a1c2-c1c16ecd2054">
+
+
+Un screenshot au format PNG du rapport de couverture Jest
+
+<img width="835" alt="Capture d’écran 2024-09-01 à 21 32 44" src="https://github.com/user-attachments/assets/82e87b64-2756-48ec-ac8c-7250c2326900">
