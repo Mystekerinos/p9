@@ -14,3 +14,12 @@ Bill
 Un screenshot au format PNG du rapport de couverture Jest
 
 <img width="835" alt="Capture d’écran 2024-09-01 à 21 32 44" src="https://github.com/user-attachments/assets/82e87b64-2756-48ec-ac8c-7250c2326900">
+
+Un screenshot au format PNG du rapport de tests Jest sur l’ensemble des fichiers d’UI (src/views) et des fichiers d’UX (src/containers):
+
+
+<img width="837" alt="Capture d’écran 2024-09-01 à 21 33 45" src="https://github.com/user-attachments/assets/ea6cbf34-d0b1-4a12-8199-0f1edb17fbde">
+
+plan de tests End-To-End pour le parcours employé :
+
+<img width="793" alt="Capture d’écran 2024-09-01 à 21 34 46" src="https://github.com/user-attachments/assets/e797ab6f-a95c-4047-99d1-c6d3a4bdcf43">
